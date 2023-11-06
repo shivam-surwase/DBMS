@@ -1,0 +1,333 @@
+1.Write a query to display the first day of the month (in datetime format) three
+months before the current month.
+Sample current date : 2014-09-03
+Expected result : 2014-06-01
+
+
+SQL> select add_months(trunc(to_date('2014-09-03','yyyy-mm-dd'),'mm'),-3) from dual;
+
+ADD_MONTH
+---------
+01-JUN-14
+---------------------------------------------------------------------------------------------------
+2.Write a query to display the last day of the month (in datetime format) three
+months before the current month.
+
+SQL> select (add_months(to_date('2014-09-03','yyyy-mm-dd'),-3))
+  2  from dual;
+
+(ADD_MONT
+---------
+03-JUN-14
+----------------------------------------------------------------------------------------------------
+3. Write a query to get the distinct Mondays from hiredate in emp tables.
+
+
+SQL> select ename, next_day(hiredate,'monday') Monday
+  2  from emp;
+
+ENAME      MONDAY
+---------- ---------
+SMITH      22-DEC-80
+ALLEN      23-FEB-81
+WARD       23-FEB-81
+JONES      06-APR-81
+MARTIN     05-OCT-81
+BLAKE      04-MAY-81
+CLARK      15-JUN-81
+SCOTT      13-DEC-82
+KING       23-NOV-81
+TURNER     14-SEP-81
+ADAMS      17-JAN-83
+JAMES      07-DEC-81
+FORD       07-DEC-81
+MILLER     25-JAN-82
+
+14 rows selected.
+
+
+--------------------------------------------------------------------------------------------------------
+4.Write a query to get the first day of the current year.
+
+
+SQL> select to_char(trunc(sysdate,'yyyy'),'day')
+  2  from dual;
+
+TO_CHAR(T
+---------
+sunday
+
+-----------------------------------------------------------------------------------------------------------------
+5.Write a query to get the last day of the current year.
+
+
+
+SQL> select to_char(trunc(last_day(sysdate),'yyyy'),'day')
+  2  from dual;
+
+TO_CHAR(T
+---------
+sunday
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+6.Write a query to calculate your age in year.
+
+SQL> select floor(months_between(sysdate,to_date('2001-05-10','yyyy-mm-dd'))/12)
+  2  from dual;
+
+FLOOR(MONTHS_BETWEEN(SYSDATE,TO_DATE('2001-05-10','YYYY-MM-DD'))/12
+
+22
+
+
+-----------------------------------------------------------------------------------------------------------------
+7. Write a query to get the current date in the following format.
+Sample date : 04-sep-2014
+Output : September 4, 2014
+
+SQL> select to_char(to_date('04-sep-2014','dd-mm-yyyy'),'month-dd-yyyy')
+  2  from dual;
+
+TO_CHAR(TO_DATE('
+-----------------
+september-04-2014
+
+
+-----------------------------------------------------------------------------------------------------------------
+8.Write a query to get the current date in Thursday September 2014 format.
+Thursday September 2014
+
+
+
+SQL> select to_char(sysdate,'day-month-yyyy')
+  2  from dual;
+
+TO_CHAR(SYSDATE,'DAY-MON
+------------------------
+monday   -october  -2023
+
+-------------------------------------------------------------------------------------------
+
+9. Write a query to extract the year from the current date.
+
+
+SQL> select extract(year from sysdate)
+  2  from dual;
+
+EXTRACT(YEARFROMSYSDATE)
+------------------------
+                    2023
+
+-------------------------------------------------------------------------------------------
+
+10. Write a query to get the first name and hire date from employees table
+where hire date between 1-Jun-87' and '30-jul-87’
+
+
+SQL> select ename,hiredate
+  2  from emp
+  3  where hiredate between '1-JUN-87' and '30-JUL-87';
+
+no rows selected
+
+
+alternate
+
+
+SQL> select ename,hiredate
+  2  from emp
+  3  where hiredate between '1-FEB-81' and '30-APR-81';
+
+ENAME      HIREDATE
+---------- ---------
+ALLEN      20-FEB-81
+WARD       22-FEB-81
+JONES      02-APR-81
+
+
+-----------------------------------------------------------------------------------------
+
+11. Write a query to display the current date in the following format.
+Sample output: Thursday 4th September 2014 00:00:00
+
+
+
+SQL> select to_char(sysdate,'day dd month yyyy hh12:mi')
+  2  from dual;
+
+TO_CHAR(SYSDATE,'DAYDDMONTHYYYYHH
+---------------------------------
+monday    02 october   2023 12:16
+
+
+------------------------------------------------------------------------------------------
+
+
+12. Write a query to display the current date in the following format.
+Sample output: 05/09/2014
+
+
+
+SQL> select to_char(sysdate,'dd/mm/yyyy')
+  2  from dual;
+
+TO_CHAR(SY
+----------
+02/10/2023
+
+------------------------------------------------------------------------------------------
+
+13. Write a query to display the current date in the following format.
+Sample output: 12:00 AM Sep 5, 2014
+
+
+SQL> select to_char(sysdate,'hh12:mi mon d, yyyy')
+  2  from dual;
+
+TO_CHAR(SYSDATE,'
+-----------------
+12:18 oct 2, 2023
+
+---------------------------------------------------------------------------------------
+
+14. Write a query to get the employees who joined in the month of June.
+
+
+SQL> select ename, hiredate
+  2  from emp
+  3  where extract(month from hiredate)=6;
+
+ENAME      HIREDATE
+---------- ---------
+CLARK      09-JUN-81
+
+
+--------------------------------------------------------------------------------------------
+
+15. Write a query to get the years in which more than 10 employees joined.
+
+SQL> select deptno,extract(year from hiredate),count(*)
+  2  from emp
+  3  group by deptno, extract(year from hiredate)
+  4  having count(*) >5;
+
+    DEPTNO EXTRACT(YEARFROMHIREDATE)   COUNT(*)
+---------- ------------------------- ----------
+        30                      1981          6
+----------------------------------------------------------------------------------------
+
+16. Write a query to get first name of employees who joined in 1987.
+
+
+SQL> select rownum,ename,hiredate
+  2  from emp
+  3  where extract(year from hiredate)=1981 and rownum<2;
+
+    ROWNUM ENAME      HIREDATE
+---------- ---------- ---------
+         1 ALLEN      20-FEB-81
+
+--------------------------------------------------------------------------------------
+
+17. Write a query to get employees whose experience is more than 5 years.
+
+
+SQL>  select ename ,hiredate, floor(months_between(sysdate,hiredate)/12)
+  2   from emp
+  3   where floor(months_between(sysdate,hiredate)/12)>5;
+
+ENAME      HIREDATE  FLOOR(MONTHS_BETWEEN(SYSDATE,HIREDATE)/12)
+---------- --------- ------------------------------------------
+SMITH      17-DEC-80                                         42
+ALLEN      20-FEB-81                                         42
+WARD       22-FEB-81                                         42
+JONES      02-APR-81                                         42
+MARTIN     28-SEP-81                                         42
+BLAKE      01-MAY-81                                         42
+CLARK      09-JUN-81                                         42
+SCOTT      09-DEC-82                                         40
+KING       17-NOV-81                                         41
+TURNER     08-SEP-81                                         42
+ADAMS      12-JAN-83                                         40
+JAMES      03-DEC-81                                         41
+FORD       03-DEC-81                                         41
+MILLER     23-JAN-82                                         41
+
+14 rows selected.
+
+----------------------------------------------------------------------------------------
+
+18. Write a query to get employee ID, name, and date, salary of the
+employees, display salary with $ symbol and thousand separator.
+
+
+SQL> select empno,ename,hiredate,to_char(sal,'$99,999,99')
+  2  from emp;
+
+     EMPNO ENAME      HIREDATE  TO_CHAR(SAL
+---------- ---------- --------- -----------
+      7369 SMITH      17-DEC-80       $8,00
+      7499 ALLEN      20-FEB-81      $16,00
+      7521 WARD       22-FEB-81      $12,50
+      7566 JONES      02-APR-81      $29,75
+      7654 MARTIN     28-SEP-81      $12,50
+      7698 BLAKE      01-MAY-81      $28,50
+      7782 CLARK      09-JUN-81      $24,50
+      7788 SCOTT      09-DEC-82      $30,00
+      7839 KING       17-NOV-81      $50,00
+      7844 TURNER     08-SEP-81      $15,00
+      7876 ADAMS      12-JAN-83      $11,00
+      7900 JAMES      03-DEC-81       $9,50
+      7902 FORD       03-DEC-81      $30,00
+      7934 MILLER     23-JAN-82      $13,00
+
+14 rows selected.
+
+-----------------------------------------------------------------------------------------
+19. Write a query to get name, hire date and experience of the employees.
+
+
+SQL> select ename,hiredate,floor(months_between(sysdate,hiredate)/12) EXPERIENCE
+  2  from emp;
+
+ENAME      HIREDATE  EXPERIENCE
+---------- --------- ----------
+SMITH      17-DEC-80         42
+ALLEN      20-FEB-81         42
+WARD       22-FEB-81         42
+JONES      02-APR-81         42
+MARTIN     28-SEP-81         42
+BLAKE      01-MAY-81         42
+CLARK      09-JUN-81         42
+SCOTT      09-DEC-82         40
+KING       17-NOV-81         41
+TURNER     08-SEP-81         42
+ADAMS      12-JAN-83         40
+JAMES      03-DEC-81         41
+FORD       03-DEC-81         41
+MILLER     23-JAN-82         41
+
+14 rows selected.
+
+------------------------------------------------------------------------------------------
+20. Write a query to get the department no, year, and number of employees
+joined.
+
+
+
+SQL> select deptno,count(*),extract(year from hiredate)
+  2  from emp
+  3  group by deptno, extract(year from hiredate);
+
+    DEPTNO   COUNT(*) EXTRACT(YEARFROMHIREDATE)
+---------- ---------- -------------------------
+        20          2                      1981
+        10          1                      1982
+        20          1                      1983
+        20          1                      1982
+        20          1                      1980
+        30          6                      1981
+        10          2                      1981
+
+7 rows selected.
