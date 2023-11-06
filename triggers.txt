@@ -1,0 +1,570 @@
+
+                       .................FUNCTION..............
+
+create or replace function generateemail(nm varchar2,jb varchar2)
+return varchar2
+as 
+begin
+return concat(concat(concat(nm,'.'),jb),'@mycompany.com')
+end;
+
+
+
+
+
+  1  create or replace function netsal(sal number,comm number)
+  2  return number
+  3  as
+  4  begin
+  5  return sal+(0.1*sal)+(0.15*sal)+(0.008*sal)+nvl(comm,0);
+  6* end;
+SQL> /
+
+Function created.
+
+SQL> select deptno,ename ,sal, netsal(sal,comm)
+  2  from emp;
+
+    DEPTNO ENAME             SAL NETSAL(SAL,COMM)
+---------- ---------- ---------- ----------------
+        20 SMITH            4500             5661
+        30 ALLEN            1600           2312.8
+        30 WARD             1250           2072.5
+        20 JONES            2975          3742.55
+        30 MARTIN           1250           2972.5
+        30 BLAKE            2850           3585.3
+        10 CLARK            2450           3082.1
+        20 SCOTT            3000             3774
+        10 KING             5000             6290
+        30 TURNER           1500             1887
+        20 ADAMS            1100           1383.8
+        30 JAMES             950           1195.1
+        20 FORD             3000             3774
+        10 MILLER           1300           1635.4
+        10 VINAY            4500             5661
+
+15 rows selected.
+==================================================================================================
+                              .......... TRIGGER............
+  
+
+  1  create or replace trigger monitor_dept
+  2  after insert on dept
+  3  for each row
+  4  begin
+  5  insert into dept_check values(:new.deptno,:new.dname,user,sysdate,current_timestamp);
+  6* end;
+SQL> /
+
+=======================================================================================================
+
+                           .................TRIGGER DEPT................
+           
+
+
+Create table:
+  1  create table dept_check(
+  2  deptno number,
+  3  olddname varchar2(30),
+  4  newdname varchar2(30),
+  5  action varchar2(20),
+  6  uname varchar2(20),
+  7  chk_dt date,
+  8* chk_time timestamp)
+  9  / 
+
+
+
+  1  create or replace trigger monitor_dept
+  2  after insert or delete or update on dept
+  3  for each row
+  4  begin
+  5  if inserting then
+  6  insert into dept_check values
+  7  (:new.deptno,null,:new.dname,'insert',user,sysdate,current_timestamp);
+  8  elsif deleting then
+  9  insert into dept_check values
+ 10  (:old.deptno,:old.dname,null,'delete',user,sysdate,current_timestamp);
+ 11  else
+ 12  insert into dept_check values
+ 13  (:old.deptno,:old.dname,:new.dname,'update',user,sysdate,current_timestamp);
+ 14  end if;
+ 15* end;
+SQL> /
+
+============================================================================================
+                          
+                             ................TRIGGER EMP..................
+
+
+
+Create Table emp
+
+  1  create table emp_chk(
+  2  deptno number,
+  3  oldename varchar2(30),
+  4  newename varchar2(30),
+  5  oldsal number,
+  6  newsal number,
+  7  action varchar2(20),
+  8  uname varchar2(20),
+  9  chk_dt date,
+ 10* chk_time timestamp)
+ 11  /
+
+Table created.
+
+
+  1  create or replace trigger monitor_emp
+  2  after insert or delete or update on emp
+  3  for each row
+  4  begin
+  5  if inserting then
+  6  insert into emp_chk values
+  7  (:new.deptno,null,:new.ename,null,:new.sal,'insert',user,sysdate,current_timestamp);
+  8  elsif deleting then
+  9  insert into emp_chk values
+ 10  (:old.deptno,:old.ename,null,:old.sal,null,'delete',user,sysdate,current_timestamp);
+ 11  else
+ 12  insert into emp_chk values
+ 13  (:old.deptno,:old.ename,:new.ename,:new.sal,:old.sal,'update',user,sysdate,current_timestamp);
+ 14  end if;
+ 15* end;
+SQL> /
+
+Trigger created.
+
+
+
+OUTPUT:
+
+
+SQL> select *from emp;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+       121 JON        ANALYST         7902 12-JAN-86       2000                    50
+       122 ADITYA     DEVELOPER       7839 15-JUN-83       3000                    50
+       123 SUNNY      HEPLER          7698 15-AUG-84       1000                    50
+
+17 rows selected.
+
+SQL> insert into emp
+  2  values(5786,'VINAY','xxx',7698,'18-JAN-86',4500,null,10);
+
+1 row created.
+
+SQL> select *from emp_chk;
+
+    DEPTNO OLDENAME                       NEWENAME                           OLDSAL     NEWSAL ACTION
+---------- ------------------------------ ------------------------------ ---------- ---------- --------------------
+UNAME                CHK_DT    CHK_TIME
+-------------------- --------- ---------------------------------------------------------------------------
+        10                                VINAY                                           4500 insert
+DBDA8                04-OCT-23 04-OCT-23 06.24.47.240000 PM
+
+
+SQL> delete emp
+  2  where deptno=50;
+
+3 rows deleted.
+
+SQL> update emp
+  2  set ename='RAHUL' and sal=7800
+  3  where empno=7369;
+set ename='RAHUL' and sal=7800
+                  *
+ERROR at line 2:
+ORA-00933: SQL command not properly ended
+
+
+SQL> update emp
+  2  set sal=4500
+  3  where empno=7369;
+
+1 row updated.
+
+SQL> select *from emp_chk;
+
+    DEPTNO OLDENAME                       NEWENAME                           OLDSAL     NEWSAL ACTION
+---------- ------------------------------ ------------------------------ ---------- ---------- --------------------
+UNAME                CHK_DT    CHK_TIME
+-------------------- --------- ---------------------------------------------------------------------------
+        10                                VINAY                                           4500 insert
+DBDA8                04-OCT-23 04-OCT-23 06.24.47.240000 PM
+
+        50 JON                                                                 2000            delete
+DBDA8                04-OCT-23 04-OCT-23 06.26.14.727000 PM
+
+        50 ADITYA                                                              3000            delete
+DBDA8                04-OCT-23 04-OCT-23 06.26.14.727000 PM
+
+        50 SUNNY                                                               1000            delete
+DBDA8                04-OCT-23 04-OCT-23 06.26.14.727000 PM
+
+        20 SMITH                          SMITH                                4500        800 update
+DBDA8                04-OCT-23 04-OCT-23 06.28.49.389000 PM
+================================================================================================================================================
+                         
+                                 ...................PATTERN FINDING (using loop :procedure)..................
+
+
+  1  create or replace procedure display_5
+  2  as
+  3  cnt number :=1;
+  4  begin
+  5  loop
+  6  DBMS_OUTPUT.PUT_LINE(cnt||',');
+  7  cnt:=cnt+1;
+  8  exit when cnt>5;
+  9  end loop;
+ 10* end;
+SQL> /
+
+-------------------------------------------------------------------------------------------------------------------
+  1  create or replace procedure pattern
+  2  as
+  3  num number :=&n;
+  4  i number;
+  5  j number;
+  6  begin
+  7  for i in 1..num
+  8  loop
+  9  for j in 1..i
+ 10  loop
+ 11  DBMS_OUTPUT.PUT('*');
+ 12  end loop;
+ 13  DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for n: 5
+old   3: num number :=&n;
+new   3: num number :=5;
+
+Procedure created.
+
+
+SQL> execute pattern;
+
+
+*
+**
+***
+****
+*****
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+  1  create or replace procedure pattern4
+  2  as
+  3  num number :=&n;
+  4  i number;
+  5  j number;
+  6  begin
+  7  for i in reverse  1..num
+  8  loop
+  9  for j in 1..i
+ 10  loop
+ 11  DBMS_OUTPUT.PUT('*');
+ 12  end loop;
+ 13  DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for n: 5
+old   3: num number :=&n;
+new   3: num number :=5;
+
+Procedure created.
+
+SQL> execute pattern4;
+
+*****
+****
+***
+**
+=======
+                       .................FUNCTION..............
+
+create or replace function generateemail(nm varchar2,jb varchar2)
+return varchar2
+as 
+begin
+return concat(concat(concat(nm,'.'),jb),'@mycompany.com')
+end;
+
+
+
+==================================================================================================
+                              .......... TRIGGER............
+  
+
+  1  create or replace trigger monitor_dept
+  2  after insert on dept
+  3  for each row
+  4  begin
+  5  insert into dept_check values(:new.deptno,:new.dname,user,sysdate,current_timestamp);
+  6* end;
+SQL> /
+
+=======================================================================================================
+
+                           .................TRIGGER DEPT................
+           
+
+
+Create table:
+  1  create table dept_check(
+  2  deptno number,
+  3  olddname varchar2(30),
+  4  newdname varchar2(30),
+  5  action varchar2(20),
+  6  uname varchar2(20),
+  7  chk_dt date,
+  8* chk_time timestamp)
+  9  / 
+
+
+
+  1  create or replace trigger monitor_dept
+  2  after insert or delete or update on dept
+  3  for each row
+  4  begin
+  5  if inserting then
+  6  insert into dept_check values
+  7  (:new.deptno,null,:new.dname,'insert',user,sysdate,current_timestamp);
+  8  elsif deleting then
+  9  insert into dept_check values
+ 10  (:old.deptno,:old.dname,null,'delete',user,sysdate,current_timestamp);
+ 11  else
+ 12  insert into dept_check values
+ 13  (:old.deptno,:old.dname,:new.dname,'update',user,sysdate,current_timestamp);
+ 14  end if;
+ 15* end;
+SQL> /
+
+============================================================================================
+                          
+                             ................TRIGGER EMP..................
+
+
+
+Create Table emp
+
+  1  create table emp_chk(
+  2  deptno number,
+  3  oldename varchar2(30),
+  4  newename varchar2(30),
+  5  oldsal number,
+  6  newsal number,
+  7  action varchar2(20),
+  8  uname varchar2(20),
+  9  chk_dt date,
+ 10* chk_time timestamp)
+ 11  /
+
+Table created.
+
+
+  1  create or replace trigger monitor_emp
+  2  after insert or delete or update on emp
+  3  for each row
+  4  begin
+  5  if inserting then
+  6  insert into emp_chk values
+  7  (:new.deptno,null,:new.ename,null,:new.sal,'insert',user,sysdate,current_timestamp);
+  8  elsif deleting then
+  9  insert into emp_chk values
+ 10  (:old.deptno,:old.ename,null,:old.sal,null,'delete',user,sysdate,current_timestamp);
+ 11  else
+ 12  insert into emp_chk values
+ 13  (:old.deptno,:old.ename,:new.ename,:new.sal,:old.sal,'update',user,sysdate,current_timestamp);
+ 14  end if;
+ 15* end;
+SQL> /
+
+Trigger created.
+
+
+
+OUTPUT:
+
+
+SQL> select *from emp;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+       121 JON        ANALYST         7902 12-JAN-86       2000                    50
+       122 ADITYA     DEVELOPER       7839 15-JUN-83       3000                    50
+       123 SUNNY      HEPLER          7698 15-AUG-84       1000                    50
+
+17 rows selected.
+
+SQL> insert into emp
+  2  values(5786,'VINAY','xxx',7698,'18-JAN-86',4500,null,10);
+
+1 row created.
+
+SQL> select *from emp_chk;
+
+    DEPTNO OLDENAME                       NEWENAME                           OLDSAL     NEWSAL ACTION
+---------- ------------------------------ ------------------------------ ---------- ---------- --------------------
+UNAME                CHK_DT    CHK_TIME
+-------------------- --------- ---------------------------------------------------------------------------
+        10                                VINAY                                           4500 insert
+DBDA8                04-OCT-23 04-OCT-23 06.24.47.240000 PM
+
+
+SQL> delete emp
+  2  where deptno=50;
+
+3 rows deleted.
+
+SQL> update emp
+  2  set ename='RAHUL' and sal=7800
+  3  where empno=7369;
+set ename='RAHUL' and sal=7800
+                  *
+ERROR at line 2:
+ORA-00933: SQL command not properly ended
+
+
+SQL> update emp
+  2  set sal=4500
+  3  where empno=7369;
+
+1 row updated.
+
+SQL> select *from emp_chk;
+
+    DEPTNO OLDENAME                       NEWENAME                           OLDSAL     NEWSAL ACTION
+---------- ------------------------------ ------------------------------ ---------- ---------- --------------------
+UNAME                CHK_DT    CHK_TIME
+-------------------- --------- ---------------------------------------------------------------------------
+        10                                VINAY                                           4500 insert
+DBDA8                04-OCT-23 04-OCT-23 06.24.47.240000 PM
+
+        50 JON                                                                 2000            delete
+DBDA8                04-OCT-23 04-OCT-23 06.26.14.727000 PM
+
+        50 ADITYA                                                              3000            delete
+DBDA8                04-OCT-23 04-OCT-23 06.26.14.727000 PM
+
+        50 SUNNY                                                               1000            delete
+DBDA8                04-OCT-23 04-OCT-23 06.26.14.727000 PM
+
+        20 SMITH                          SMITH                                4500        800 update
+DBDA8                04-OCT-23 04-OCT-23 06.28.49.389000 PM
+================================================================================================================================================
+                         
+                                 ...................PATTERN FINDING (using loop :procedure)..................
+
+
+  1  create or replace procedure display_5
+  2  as
+  3  cnt number :=1;
+  4  begin
+  5  loop
+  6  DBMS_OUTPUT.PUT_LINE(cnt||',');
+  7  cnt:=cnt+1;
+  8  exit when cnt>5;
+  9  end loop;
+ 10* end;
+SQL> /
+
+-------------------------------------------------------------------------------------------------------------------
+  1  create or replace procedure pattern
+  2  as
+  3  num number :=&n;
+  4  i number;
+  5  j number;
+  6  begin
+  7  for i in 1..num
+  8  loop
+  9  for j in 1..i
+ 10  loop
+ 11  DBMS_OUTPUT.PUT('*');
+ 12  end loop;
+ 13  DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for n: 5
+old   3: num number :=&n;
+new   3: num number :=5;
+
+Procedure created.
+
+
+SQL> execute pattern;
+
+
+*
+**
+***
+****
+*****
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+  1  create or replace procedure pattern4
+  2  as
+  3  num number :=&n;
+  4  i number;
+  5  j number;
+  6  begin
+  7  for i in reverse  1..num
+  8  loop
+  9  for j in 1..i
+ 10  loop
+ 11  DBMS_OUTPUT.PUT('*');
+ 12  end loop;
+ 13  DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for n: 5
+old   3: num number :=&n;
+new   3: num number :=5;
+
+Procedure created.
+
+SQL> execute pattern4;
+
+*****
+****
+***
+**
+>>>>>>> 6b7d508ad23d7f7f0acdefd9258c9659798b9123
+*
