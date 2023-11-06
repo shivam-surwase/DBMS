@@ -1,0 +1,159 @@
+1.
+
+  1  create procedure ap(l number,w number)
+  2  as
+  3  peri number;
+  4  area number;
+  5  begin
+  6  peri:=2*(l*w);
+  7  area:=l*w;
+  8  DBMS_OUTPUT.PUT_LINE('perimeter: '||peri ||'Area: '||area);
+  9* end;
+SQL> /
+
+Procedure created.
+
+SQL> execute ap(10,2);
+
+PL/SQL procedure successfully completed.
+
+SQL> set serveroutput on;
+SQL> execute ap(10,2);
+perimeter: 40Area: 20
+
+PL/SQL procedure successfully completed.
+
+
+==========================================================================================================================
+
+2.
+
+
+  1  create or replace procedure cubesq
+  2  as
+  3  num number:=&n;
+  4  cube number;
+  5  square number;
+  6  begin
+  7  cube:=(num*num*num);
+  8  square:=(num*num);
+  9  DBMS_OUTPUT.PUT_LINE('CUBE:= '|| cube || 'SQUARE:=' || square);
+ 10* END;
+SQL> /
+Enter value for n: 5
+old   3: num number:=&n;
+new   3: num number:=5;
+
+Procedure created.
+
+SQL> execute cubesq;
+
+PL/SQL procedure successfully completed.
+
+SQL> set serveroutput on;
+SQL> execute cubesq;
+CUBE:= 125SQUARE:=25
+
+PL/SQL procedure successfully completed.
+
+
+=========================================================================================================================
+3.
+
+  1  create or replace procedure temperture
+  2  as
+  3  C number:=&c;
+  4  F number:=&f;
+  5  celsius number;
+  6  fehrenheit number;
+  7  begin
+  8  celsius:=round((F-32)*5/9,2);
+  9  fehrenheit:=9/5*C+32;
+ 10  DBMS_OUTPUT.PUT_LINE('celsius: '||celsius||'fehrenheit: '||fehrenheit);
+ 11* end;
+SQL> /
+Enter value for c: 50
+old   3: C number:=&c;
+new   3: C number:=50;
+Enter value for f: 120
+old   4: F number:=&f;
+new   4: F number:=120;
+
+Procedure created.
+
+SQL> execute temperture;
+celsius: 48.89fehrenheit: 122
+
+PL/SQL procedure successfully completed.
+
+=================================================================================================================================
+4.
+
+
+  1  create or replace procedure converstion(inch number)
+  2  as
+  3  yard number;
+  4  foot number;
+  5  inc number;
+  6  begin
+  7  yard:=floor(inch/36);
+  8  foot:=floor(mod(inch,36)/12);
+  9  inc:=floor(mod(mod(inch,36),12));
+ 10  DBMS_OUTPUT.PUT_LINE('Yards:'||yard||'Foot'||foot||'Inches:'||inc);
+ 11* end;
+SQL> /
+
+Procedure created.
+
+SQL> set serveroutput on;
+SQL> execute converstion (124);
+Yards:3Foot1Inches:4
+
+PL/SQL procedure successfully completed.
+
+=========================================================================================================
+5.
+
+
+
+  1  create or replace procedure check_1(num number)
+  2  as
+  3  begin
+  4  if mod(num,5)=0 then
+  5  DBMS_OUTPUT.PUT_LINE('Number is divisible by 5');
+  6  else
+  7  DBMS_OUTPUT.PUT_LINE('Number is not divisible by 5');
+  8  end if;
+  9* end;
+ 10  /
+
+Procedure created.
+
+SQL> execute check_1(25);
+Number is divisible by 5
+
+PL/SQL procedure successfully completed.
+
+============================================================================================================
+
+
+  1  create or replace procedure display(dno number)
+  2  as
+  3  cnt number;
+  4  a number:=1;
+  5  tol number;
+  6  begin
+  7  select count(*) into cnt
+  8  from emp
+  9  where deptno=dno;
+ 10  tol:=a-cnt;
+ 11  DBMS_OUTPUT.PUT_LINE('total_count'||tol);
+ 12* end;
+SQL> /
+
+Procedure created.
+
+SQL> execute display(20);
+total_count-4
+
+PL/SQL procedure successfully completed.
